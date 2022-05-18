@@ -1,5 +1,5 @@
 # Project Template
-This is a repository for DEA in fisheries projects.
+This is a repository for DEA Toolbox project.
 
 # Overview and Folder structure
 
