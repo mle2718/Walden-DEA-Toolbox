@@ -1,8 +1,9 @@
 # Project Template
-This is a repository for DEA Toolbox project.
+This is a repository for DEA Toolbox project. DEA programs which have been developed and used to estimate various measures of efficiency are included in this repository.
 
 # Overview and Folder structure
 
+The repository holds R programs which are used to estimate specific DEA models. There may be several different versions of the same program depending on the type of DEA model and the data available. In most cases, publicly available data will be used to facilitate replication. For some problems, artificial fishery data will be used to illustrate a specific problem. 
 
 
 # NOAA Requirements
