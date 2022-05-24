@@ -1,4 +1,4 @@
-# Project Template
+# Project Description
 This is a repository for DEA Toolbox project. DEA programs which have been developed and used to estimate various measures of efficiency are included in this repository.
 
 # Overview and Folder structure
