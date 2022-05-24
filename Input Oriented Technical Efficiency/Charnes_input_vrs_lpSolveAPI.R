@@ -8,13 +8,11 @@ rm(list=ls())
 rm(list=ls())
 library(Rglpk)
 library(Benchmarking)
-library(readr)
 ######################################################
 #Beginning of Data Step
 ####################################################################
 data(charnes1981)
 df1<-charnes1981
-names(df1)
 ###################################################################
 # create input X matrix
 X<-df1[,c("x1","x2","x3","x4","x5")]
