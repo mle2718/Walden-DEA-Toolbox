@@ -5,9 +5,11 @@ This is a repository for DEA Toolbox project. DEA programs which have been devel
 
 The repository holds R programs which are used to estimate specific DEA models. There may be several different versions of the same program depending on the type of DEA model and the data available. In most cases, publicly available data will be used to facilitate replication. For some problems, artificial fishery data will be used to illustrate a specific problem. 
 
-Output Oriented Models - ./Output Oriented Technical Efficiency
-Input Oriented Models - ./Input Oriented Technical Efficiency
-Documentation - ./Documentation
+Output Oriented Models - Output Oriented Technical Efficiency
+
+Input Oriented Models -  Input Oriented Technical Efficiency
+
+Documentation - Documentation
 
 
 # NOAA Requirements
