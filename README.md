@@ -1,13 +1,16 @@
-# Project Template
+# Project Description
 This is a repository for DEA Toolbox project. DEA programs which have been developed and used to estimate various measures of efficiency are included in this repository.
 
 # Overview and Folder structure
 
 The repository holds R programs which are used to estimate specific DEA models. There may be several different versions of the same program depending on the type of DEA model and the data available. In most cases, publicly available data will be used to facilitate replication. For some problems, artificial fishery data will be used to illustrate a specific problem. 
 
-Output Oriented Models - ./Output Oriented Technical Efficiency
-Input Oriented Models - ./Input Oriented technical Efficiency
-Documentation         -./Documentation
+
+Output Oriented Models - Output Oriented Technical Efficiency
+
+Input Oriented Models -  Input Oriented Technical Efficiency
+
+Documentation - Documentation
 
 
 # NOAA Requirements
@@ -16,8 +19,8 @@ This repository is a scientific product and is not official communication of the
 
 1. who worked on this project:  John Walden
 1. when this project was created: May 2022 
-1. what the project does: Helps people get organized.  Shows how to get data from NEFSC oracle 
-1. why the project is useful:  Helps people get organized.  Shows how to get data from NEFSC oracle 
+1. what the project does: Stores DEA code and models 
+1. why the project is useful:  Helps people construct and Solve DEA models 
 1. how users can get started with the project: Download and follow the readme
 1. where users can get help with your project:  email me or open an issue
 1. who maintains and contributes to the project. John Walden

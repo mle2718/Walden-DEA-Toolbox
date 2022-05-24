@@ -11,5 +11,7 @@ Recently, a package OMPR was developed and released which I believe makes progra
 
 # Description of the folders
 
-Output Oriented Technical Efficiency - Holds programs which solve the output oriented technical efficiency problem
-Input Oriented Technical Efficiency - Holds programs which solve the input oriented technical efficiency problem
+Output Oriented Technical Efficiency - Holds programs which solve the output oriented technical efficiency problem.
+
+Input Oriented Technical Efficiency - Holds programs which solve the input oriented technical efficiency problem.
+
