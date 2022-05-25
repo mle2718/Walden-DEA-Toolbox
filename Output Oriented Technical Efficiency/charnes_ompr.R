@@ -67,6 +67,7 @@ for(s in 1:(S-1)){
   
 }
 summary(status)    #See if everything Solved
+stopifnot(sum(status!=0)==0) #Hard stop if any entries in status are non-zero
 res                #results
 summary(res-bench) #comparing results against those from the Benchmark program
 ###############################################################################

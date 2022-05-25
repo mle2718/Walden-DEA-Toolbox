@@ -1,6 +1,6 @@
 #DEA Program to demonstrate using CHARNES data with Benchmark Program
 ###############################################################################
-rm(list=ls()); 
+rm(list=ls()) 
 graphics.off()
 ###############################################################################
 library(Benchmarking)
