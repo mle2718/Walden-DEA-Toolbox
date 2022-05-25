@@ -5,7 +5,6 @@
 ####################################################################
 #First Clear any previous data stored in memory, and require lpSolveAPI and readr
 rm(list=ls())
-rm(list=ls())
 library(Rglpk)
 library(Benchmarking)
 ######################################################
