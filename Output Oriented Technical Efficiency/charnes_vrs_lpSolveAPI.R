@@ -3,11 +3,10 @@
 #Model is taken from "Production Frontiers" (1994) by Fare, Grosskopf and Lovell
 #This version calculates a VRS model
 ####################################################################
-#First Clear any previous data stored in memory, and require lpSolveAPI and readr
+#First Clear any previous data stored in memory, and require lpSolveAPI
 rm(list=ls())
 library(lpSolveAPI)
 library(Benchmarking)
-library(readr)
 ######################################################
 #Beginning of Data Step
 ####################################################################
@@ -29,6 +28,8 @@ YX=cbind(Y,X)
 ###################################################################
 #Define A Matrix. M+N+1 rows allows for VRS. 
 A=matrix(0,M+N+1,J+1)
+#Note J+1 columns which is one more than the number of observations
+#Column J+1 will be changed for each DEA Model
 #Next, Transform YX matrix and copy to A. 
 A[1:(M+N),1:J]=t(YX)
 #Now, set the last row in the A matrix equal to 1, for all J values
@@ -60,23 +61,30 @@ status2=0                   #Vector to hold model solve status. 0=Model solved
 #Start of DEA loop
 ##############################################################################
 for(j in 1:J){
-  A[1:M,J+1]=-A[1:M,j]
+  A[1:M,J+1]=-A[1:M,j]               #replace last column in A for m outputs 
+                                     #by negative j A column 
+                                     #for output oriented model
+  
   rhs=c(rep(0,M),as.matrix(X[j,]),1) #rhs is being set to 0 for outputs, observation
                                      #j input data from X, and 1 for VRS
   set.rhs(LP_API,rhs) 
-  set.column(LP_API,nc,A[,nc])       #loading revised input data into LPApi matrix
+  set.column(LP_API,nc,A[,nc])       #loading revised input data into LpAPI
   set.objfn(LP_API,obj)
 
-  (status2[j]=solve(LP_API))
-  (objvals2[j]=round(get.objective(LP_API),3))
+  status2[j]=solve(LP_API)           #solve model
+  
+  objvals2[j]=round(get.objective(LP_API),3)
 
   if(j%%100==0|j==J)  print(paste('on dmu',j,'of',J))
     
 } # end loop   for(j in 1:J)
-
-summary(status2)
-e<-dea(X,Y,RTS="vrs",ORIENTATION="out")#Run dea model using Benchmarking package to test
+###############################################################################
+e<-dea(X,Y,RTS="vrs",ORIENTATION="out")#Run DEA model using Benchmarking package to test
 bench<-round(e$objval,3)               #store results in data structure bench
-
+################################################################################
+summary(status2)
+summary(objvals2)
+summary(bench)
 summary(objvals2-bench)
+
 

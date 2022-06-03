@@ -11,9 +11,13 @@ Recently, a package OMPR was developed and released which I believe makes progra
 
 # Description of the folders
 
+Capacity Models - Holds programs which are used to estimate plant capacity. These are R versions of models which have been used worldwide to estimate fishing vessel capacity.
+
 Output Oriented Technical Efficiency - Holds programs which solve the output oriented technical efficiency problem.
 
 Input Oriented Technical Efficiency - Holds programs which solve the input oriented technical efficiency problem.
 
-Capacity Models - Holds programs which are used to estimate plant capacity. These are R versions of models which have been used worldwide to estimate fishing vessel capacity.
+Directional Distance Function - DDF models written in R. 
+
+
 

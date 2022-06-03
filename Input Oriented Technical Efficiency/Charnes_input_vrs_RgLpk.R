@@ -3,7 +3,7 @@
 #Model is taken from "Production Frontiers" (1994) by Fare, Grosskopf and Lovell
 #This version calculates a VRS model
 ####################################################################
-#First Clear any previous data stored in memory, and require lpSolveAPI and readr
+#First Clear any previous data stored in memory, and require Rglpk
 rm(list=ls())
 library(Rglpk)
 library(Benchmarking)
@@ -38,18 +38,22 @@ dir=c(rep('>=',M),rep('<=',N),'==')
 res=0
 status=0
 for(j in (1:J)){
-  (A[(M+1):(M+N),J+1]=-A[(M+1):(M+N),j])
-  (rhs=c(as.matrix(Y[j,]),rep(0,N),1))   #rhs is being set to obs j output data, 
-  #0 for the input data, and 1 for VRS
-  sol<- Rglpk_solve_LP(obj=obj, mat=A, dir=dir, rhs=rhs, max=F) #Solve using RGLPK
+  (A[(M+1):(M+N),J+1]=-A[(M+1):(M+N),j])#change last column in A Matrix 
+                                        #for the input rows to be the 
+                                        #negative of column j input rows
+  (rhs=c(as.matrix(Y[j,]),rep(0,N),1))  #rhs is being set to obs j output data, 
+                                        #0 for the input data, and 1 for VRS
+  sol<- Rglpk_solve_LP(obj=obj, mat=A, dir=dir, rhs=rhs, max=F) 
+  #Solve using RGLPK
   status[(j)]=sol$status
   res[(j)]=round(sol$optimum,3)
   if(j%%100==0|j==J)  print(paste('on dmu',j,'of',J))
-  
 }
 summary(status) 
 ################################################################################
 e<-dea(X,Y,RTS="vrs",ORIENTATION="in")#Run dea model using Benchmarking package to test
 bench<-round(e$objval,3)               #store results in data structure bench
+################################################################################
+summary(res)
 summary(res-bench)
 ################################################################################

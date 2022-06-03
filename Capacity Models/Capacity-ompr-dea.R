@@ -7,17 +7,17 @@
 #This version uses the ompr package to set up the DEA program, and then the 
 #the RGLPK solver.
 #The optimal variable inputs needed will be calculated external to the Main LP
-#model after saving the peer values from each DEA model run.#This program uses the OMPR package to set up the Johansen Capacity Model
+#model after saving the peer values from each DEA model run.
+#This program uses the OMPR package to set up the Johansen Capacity Model
+##############################################################################
 rm(list=ls())
-###############################################################################
 #First load required packages
 library(ompr)
-library(ompr.roi)
 library(dplyr)
 library(Rglpk)
+library(Benchmarking)
 ###############################################################################
-#Read in the Charnes data into df1
-#Read data into dataframe df1
+#Read the data into df1
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 df1<-read.csv('fishery_data.csv')
 ####################################################################
@@ -53,8 +53,6 @@ model1<-MIPModel() %>%
 names(obj1)=vnames1;                                   #set names for the objective function 
 obj1                                                   #echo names. Can be turned off later
 constraints1 <- (extract_constraints(model1))          #set constraints
-
-
 ################################################################################
 #Set up A matrix and run for multiple observations
 ################################################################################
@@ -65,8 +63,8 @@ colnames(A)=vnames1;
 S=ncol(A)
 ##############################################################################
 #Initialize PEER Matrix
-peers<-matrix(0,(S-1),(S-1))  #S is the number of columns in A matrix, which is
-                              #J+1, Need Peers for J observations
+peers<-matrix(0,(S-1),(S-1))  #S is the number of columns in A matrix, which 
+                              #equals J+1. Need Peers for J observations
 ##############################################################################
 res=0
 status=0
@@ -75,22 +73,32 @@ status=0
 ##############################################################################
 for(s in 1:(S-1)){
   
-  A[1:M,S]=-A[1:M,s]         #replace last column in A for m outputs 
-  #by negative s A column for output oriented model
+  A[1:M,S]=-A[1:M,s]        #replace last column in A for m outputs 
+                            #by negative j column for output oriented 
+                            #model
   
-  rhs=c(rep(0,M),A[(M+1):(M+N),s],1)
-  sol<- Rglpk_solve_LP(obj=obj1, mat=A, dir=dirs1, rhs=rhs, max=T) #Solve using RGLPK
+  rhs=c(rep(0,M),A[(M+1):(M+N),s],1)   #Zero for outputs, row s for input 
+                                       #and one for VRS
+  
+  sol<- Rglpk_solve_LP(obj=obj1, mat=A, dir=dirs1, rhs=rhs, max=T) 
+  #Solve using RGLPK
+  
   status[(s)]=sol$status
   res[(s)]=round(sol$optimum,3)
   peers[s,]<-sol$solution[1:(S-1)]
   if(s%%100==0|s==S)  print(paste('on dmu',s,'of',S-1))
-  
 }
 ###############################################################################
 VI<-peers%*%VX   #This calculates the optimal variable input levels.
+###############################################################################
+e<-dea(X,Y,RTS="vrs",ORIENTATION="out")#Run dea model using Benchmarking package to test
+bench<-round(e$objval,3)  
+################################################################################
 summary(status)    #See if everything Solved
-
-summary(res)                #results
+summary(res)       #results
+summary(bench)     #Results from Benchmark package
+summary(res-bench)
+###############################################################################
 summary(VI)
 ###############################################################################
 

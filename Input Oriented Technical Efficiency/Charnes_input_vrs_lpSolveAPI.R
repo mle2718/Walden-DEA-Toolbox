@@ -3,9 +3,9 @@
 #Model is taken from "Production Frontiers" (1994) by Fare, Grosskopf and Lovell
 #This version calculates a VRS model
 ####################################################################
-#First Clear any previous data stored in memory, and require lpSolveAPI and readr
+#First Clear any previous data stored in memory, and requires lpSolveAPI
 rm(list=ls())
-library(Rglpk)
+library(lpSolveAPI)
 library(Benchmarking)
 ######################################################
 #Beginning of Data Step
@@ -53,11 +53,13 @@ for(i in 1:nr){
 objval=0
 status=0
 for(j in 1:J){
-  (A[(M+1):(M+N),J+1]=-A[(M+1):(M+N),j])
+  (A[(M+1):(M+N),J+1]=-A[(M+1):(M+N),j]) #Insert  negative inputs from 
+                                         #observation s into last column of A
+                                         #matrix
   (rhs=c(as.matrix(Y[j,]),rep(0,N),1))   #rhs is being set to obs j output data, 
                                          #0 for the input data, and 1 for VRS
   set.rhs(LP_API,rhs) 
-  set.column(LP_API,nc,A[,nc]) #loading revised input data into LPApi matrix
+  set.column(LP_API,nc,A[,nc])           #loading revised input data into LPApi
   set.objfn(LP_API,obj)
 
   (status[j]=solve(LP_API))
@@ -66,9 +68,11 @@ for(j in 1:J){
   if(j%%100==0|j==J)  print(paste('on dmu',j,'of',J))
     
 } # end loop   for(j in 1:J)
-
-summary(status)
 #############################################################################
 e<-dea(X,Y,RTS="vrs",ORIENTATION="in")#Run dea model using Benchmarking package to test
 bench<-round(e$objval,3)               #store results in data structure bench
+##############################################################################
+summary(status)
+summary(objval)
+summary(bench)
 summary(objval-bench)
