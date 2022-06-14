@@ -19,7 +19,6 @@ library(dplyr)
 ####################################################################
 #Beginning of Data Step
 ####################################################################
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 data(charnes1981)
 df1<-charnes1981
 #df1<-df1[1:10,]
@@ -41,7 +40,6 @@ j=1                                    #set j=1 for initial DEA matrix(M=ncol(Y)
 #Set-up the DEA model using OMPR for one observation. This step sets up the A 
 #matrix, rhs values and objective function to use in DEA Model
 ###############################################################################
-j=1
 model1<-MIPModel() %>%
   add_variable(z[j],j=1:J, lb=0) %>%
   add_variable(Beta, lb=-Inf, ub=Inf) %>%
@@ -59,7 +57,7 @@ A = as.matrix(constraints1$matrix);
 colnames(A)=vnames1; 
 dirs1 = constraints1$sense       #Signs for Constraints
 rhs1 = constraints1$rhs          #RHS values for first observation
-S=ncol(A)
+S=ncol(A)                        #S is needed to set up correct columns for LP
 ###############################################################################
 #Model #1 - Expand Outputs and Holds Inputs Constants
 #Directional Vector is set equal to the Observed values
