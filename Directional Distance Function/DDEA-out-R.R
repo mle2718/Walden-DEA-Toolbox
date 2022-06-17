@@ -15,7 +15,6 @@ rm(list=ls())
 library(Rglpk)
 library(ompr)
 library(Benchmarking)
-library(dplyr)
 ####################################################################
 #Beginning of Data Step
 ####################################################################
@@ -25,14 +24,16 @@ df1<-charnes1981
 ###################################################################
 names(df1)
 J=nrow(df1)
-X<-df1[,c("x1","x2","x3","x4","x5")]   #Read x variables into X data frame
-Y<-df1[,c("y1","y2","y3")]             #Read y variables into Y data frame
+#create input X Matrix
+X<-as.matrix(df1[,c("x1","x2","x3","x4","x5")])
+#create output Y matrix
+Y<-as.matrix(df1[,c("y1","y2","y3")])             
 ###################################################################
 m<-colnames(Y)                         #Read column names of Y into m
 M=length(m)
 n<-colnames(X)                         #Read column names of X into m
 N=length(n)
-j=1                                    #set j=1 for initial DEA matrix(M=ncol(Y))
+jp=1                                    #set j=1 for initial DEA matrix(M=ncol(Y))
 ###################################################################
 #End of DATA Step
 ####################################################################
@@ -44,8 +45,8 @@ model1<-MIPModel() %>%
   add_variable(z[j],j=1:J, lb=0) %>%
   add_variable(Beta, lb=-Inf, ub=Inf) %>%
   set_objective(1*Beta,"max") %>%
-  add_constraint(sum_over(z[j]*Y[j,m], j = 1:J) >= (1+Beta)*Y[j,m], m = 1:M) %>%
-  add_constraint(sum_over(z[j]*X[j,n], j = 1:J) <= X[j,n], n = 1:N)%>%
+  add_constraint(sum_over(z[j]*Y[j,m], j = 1:J) >= (1+Beta)*Y[jp,m], m = 1:M) %>%
+  add_constraint(sum_over(z[j]*X[j,n], j = 1:J) <= X[jp,n], n = 1:N)%>%
   add_constraint(sum_over(z[j], j=1:J) ==1)
 
 vnames1 = variable_keys(model1)                      #Extract the name of the variables for this model 
@@ -69,8 +70,9 @@ for(s in 1:(S-1)){
   
   A[(1:M),S]=-A[(1:M),s]       #replace last column in A for m outputs 
                                 #by negative s A column for output oriented model
-  rhs=A[,s]                    #RHS constraints. For DDF Model, A
-  
+  ####################################################################
+  #set RHS
+  rhs=c(as.matrix(Y[s,]),as.matrix(X[s,]),1)
   sol<- Rglpk_solve_LP(obj=obj1, mat=A, dir=dirs1, rhs=rhs, max=T) 
   #Solve using RGLPK
   
@@ -91,15 +93,15 @@ summary(bench)
 summary(res-bench)
 #################################################################################
 #Model #2 - Expand outputs and Contract Inputs using the directional vector [Y,X]
-#First, set up the 
+#First, set up the ompr Model
 #################################################################################
-j=1
+jp=1
 model2=MIPModel() %>%
   add_variable(z[j], j=1:J, lb = 0)%>% 
   add_variable(Beta, lb = -Inf, ub = Inf) %>%
   set_objective(1*Beta,"max") %>%
-  add_constraint(sum_over(Y[j,m] * z[j], j = 1:J) >= (1+Beta)*Y[j,m] , m = 1:M) %>%
-  add_constraint(sum_over(X[j,n] * z[j], j = 1:J) <= (1-Beta)*X[j,n] , n = 1:N) %>%
+  add_constraint(sum_over(Y[j,m] * z[j], j = 1:J) >= (1+Beta)*Y[jp,m] , m = 1:M) %>%
+  add_constraint(sum_over(X[j,n] * z[j], j = 1:J) <= (1-Beta)*X[jp,n] , n = 1:N) %>%
   add_constraint(sum_over(1*z[j], j = 1:J) == 1.0)
 
 vnames1 = variable_keys(model2)                      #Extract the name of the variables for this model 
@@ -116,10 +118,10 @@ res2=0
 status2=0
 for(s in 1:(S-1)){
   
-  A[(1:M),S]=-A[(1:M),s]     #last column in A for m outputs is negative A[,s]
+  A[(1:M),S]=-A[(1:M),s]            #last column in A for m outputs is negative A[,s]
   A[(M+1):(M+N),S]=A[(M+1):(M+N),s] #last column for inputs is A[(M+1):(M+N),s]
-  rhs=A[,s]                         #RHS constraints. For DDF Model, A
-  
+ 
+  rhs=c(as.matrix(Y[s,]),as.matrix(X[s,]),1)       #rhs for ddf model
   sol<- Rglpk_solve_LP(obj=obj1, mat=A, dir=dirs1, rhs=rhs, max=T) 
   #Solve using RGLPK
   
@@ -133,13 +135,13 @@ summary(res2)
 ####################################################################################
 #Model #3 - Expand outputs using vector [1,0] 
 #################################################################################
-j=1
+jp=1
 model3=MIPModel() %>%
   add_variable(z[j], j=1:J, lb = 0)%>% 
   add_variable(Beta, lb = -Inf, ub = Inf) %>%
   set_objective(1*Beta,"max") %>%
-  add_constraint(sum_over(Y[j,m] * z[j], j = 1:J) >= Y[1,m]+Beta , m = 1:M) %>%
-  add_constraint(sum_over(X[j,n] * z[j], j = 1:J) <= X[1,n] , n = 1:N) %>%
+  add_constraint(sum_over(Y[j,m] * z[j], j = 1:J) >= Y[jp,m]+Beta , m = 1:M) %>%
+  add_constraint(sum_over(X[j,n] * z[j], j = 1:J) <= X[jp,n] , n = 1:N) %>%
   add_constraint(sum_over(1*z[j], j = 1:J) == 1.0)
 
 vnames1 = variable_keys(model3)                      #Extract the name of the variables for this model 
@@ -156,12 +158,15 @@ res3=0
 status3=0
 for(s in (1:(S-1))){
 
-  (rhs=A[,s])
-  
+  ##################################################################################
+  rhs=c(as.matrix(Y[s,]),as.matrix(X[s,]),1)       #rhs for ddf model
+  #Note that the only thing which changes in this model is the RHS
+  #last column in A matrix for all outputs will always be -1
+  ###################################################################################
   sol<- Rglpk_solve_LP(obj=obj1, mat=A, dir=dirs1, rhs=rhs, max=T) #Solve using RGLPK
   status3[s]=sol$status
   res3[s]=round(sol$optimum,3)
-  if(j%%100==0|j==J)  print(paste('on dmu',j,'of',J))
+  if(s%%100==0|s==S)  print(paste('on dmu',S,'of',S))
   
 }
 ##########################################################################################

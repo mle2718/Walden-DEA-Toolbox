@@ -14,13 +14,15 @@ data(charnes1981)
 df1<-charnes1981
 ###############################################################################
 J=nrow(df1)                            #Number of observations
-X<-df1[,c("x1","x2","x3","x4","x5")]   #Read x variables into X data frame
-Y<-df1[,c("y1","y2","y3")]             #Read y variables into Y data frame
+# create input X matrix
+X<-as.matrix(df1[,c("x1","x2","x3","x4","x5")])
+# create output Y matrix
+Y<-as.matrix(df1[,c("y1","y2","y3")])          
 m<-colnames(Y)                         #Read column names of Y into m
 M=length(m)
 n<-colnames(X)                         #Read column names of X into m
 N=length(n)
-j=1                                    #set j=1 for initial DEA matrix
+jp=1                                    #set jp=1 for initial DEA matrix
 ################################################################################
 ###############################################################################
 #Set-up the DEA model using OMPR for one observation. This step sets up the A 
@@ -30,8 +32,8 @@ model1<-MIPModel() %>%
   add_variable(z[j],j=1:J, lb=0) %>%
   add_variable(theta, lb=0, ub=Inf) %>%
   set_objective(1*theta,"max") %>%
-  add_constraint(sum_over(z[j]*Y[j,m], j = 1:J) >= theta*Y[j,m], m = 1:M) %>%
-  add_constraint(sum_over(z[j]*X[j,n], j = 1:J) <= X[j,n], n = 1:N)%>%
+  add_constraint(sum_over(z[j]*Y[j,m], j = 1:J) >= theta*Y[jp,m], m = 1:M) %>%
+  add_constraint(sum_over(z[j]*X[j,n], j = 1:J) <= X[jp,n], n = 1:N)%>%
   add_constraint(sum_over(z[j], j=1:J) ==1)
 ###############################################################################
 #End of using OMPR to define initial problem

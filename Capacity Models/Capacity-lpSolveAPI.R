@@ -12,18 +12,20 @@
 rm(list=ls())
 ####################################################################
 ####################################################################
+library(tidyverse)
 library(Rglpk)
 library(lpSolveAPI)
 ####################################################################
 #Read data into dataframe df1
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-df1<-read.csv('fishery_data.csv')   #Data file should be in Working Directory
+df1<-read_csv('fishery_data.csv')   #Data file should be in Working Directory
 ####################################################################
 # create input X data frame. Put fixed inputs into X matrix and Variable
 #inputs into VX data frame.
-X<-df1[,c("FX1","FX2")]      #FX1 and FX2 are Fixed Inputs
-VX<-df1[,c("V1")]            #VX is the single Variable Input
-Y<-df1[,c("Q1", "Q2","Q3")]  #Q1, Q2, and Q3 are the Outputs. Species of Fish
+X<-as.matrix(df1[,c("FX1","FX2")])      #FX1 and FX2 are Fixed Inputs
+VX<-as.matrix(df1[,c("V1")])            #VX is the single Variable Input
+#create output Y matrix
+Y<-as.matrix(df1[,c("Q1", "Q2","Q3")])  #Q1, Q2, and Q3 are the Outputs. Species of Fish
 ####################################################################
 M=ncol(Y)
 N=ncol(X)

@@ -14,27 +14,30 @@ rm(list=ls())
 #First load required packages
 library(ompr)
 library(dplyr)
+library(tidyverse)              
 library(Rglpk)
 library(Benchmarking)
 ###############################################################################
 #Read the data into df1
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-df1<-read.csv('fishery_data.csv')
+df1<-read_csv('fishery_data.csv', show_col_types = FALSE)
 ####################################################################
-# create input X data frame. Put fixed inputs into X matrix and Variable
-#inputs into VX data frame.
-Y<-df1[,c("Q1", "Q2","Q3")]  #Q1, Q2, and Q3 are the Outputs. Species of Fish
-X<-df1[,c("FX1","FX2")]      #FX1 and FX2 are Fixed Inputs
-VX<-df1[,c("V1")]            #VX is the single Variable Input
-####################################################################
+#df1<-df1[(1:10),]
+# create input X Matrix. Put fixed inputs into X matrix and Variable
+#inputs into VX Matrix.
+X<-as.matrix(df1[,c("FX1","FX2")])      #FX1 and FX2 are Fixed Inputs
+VX<-as.matrix(df1[,c("V1")])            #VX is the single Variable Input
+#create output Y matrix
+Y<-as.matrix(df1[,c("Q1", "Q2","Q3")])  #Q1, Q2, and Q3 are the Outputs. Species of Fish
+#####################################################################
 YX=cbind(Y,X)
 ###############################################################################
-J=nrow(df1)                            #Number of observations
+J=nrow(Y)                              #Number of observations
 m<-colnames(Y)                         #Read column names of Y into m
 M=length(m)
 n<-colnames(X)                         #Read column names of X into m
 N=length(n)
-j=1                                    #set j=1 for initial DEA matrix
+jp=1                                    #set jp=1 for initial DEA matrix
 ################################################################################
 ###############################################################################
 #Set-up the DEA model using OMPR for one observation. This step sets up the A 
@@ -42,17 +45,16 @@ j=1                                    #set j=1 for initial DEA matrix
 ###############################################################################
 model1<-MIPModel() %>%
   add_variable(lambda[j],j=1:J) %>%
-  add_variable(theta[j]) %>%
-  set_objective(sum_over(theta[j], j = 1),"max") %>%
-  add_constraint(sum_over(lambda[j]*Y[j,m], j = 1:J) >= theta[j]*Y[j,m], m = 1:M) %>%
-  add_constraint(sum_over(lambda[j]*X[j,n], j = 1:J) <= X[j,n], n = 1:N)%>%
+  add_variable(theta) %>%
+  set_objective(1*theta,"max") %>%
+  add_constraint(sum_over(lambda[j]*Y[j,m], j = 1:J) >= theta*Y[jp,m], m = 1:M) %>%
+  add_constraint(sum_over(lambda[j]*X[j,n], j = 1:J) <= X[jp,n], n = 1:N)%>%
   add_constraint(sum_over(lambda[j], j=1:J) ==1)
 
-(vnames1 = variable_keys(model1))                      #Extract the name of the variables for this model 
-(obj1=as.vector(objective_function(model1)$solution)); #Extract objective function values
-names(obj1)=vnames1;                                   #set names for the objective function 
-obj1                                                   #echo names. Can be turned off later
-constraints1 <- (extract_constraints(model1))          #set constraints
+vnames1 = variable_keys(model1)                      #Extract the name of the variables for this model 
+obj1=as.vector(objective_function(model1)$solution)  #Extract objective function values
+names(obj1)=vnames1;                                 #set names for the objective function 
+constraints1 <- (extract_constraints(model1))        #set constraints
 ################################################################################
 #Set up A matrix and run for multiple observations
 ################################################################################
@@ -93,7 +95,7 @@ VI<-peers%*%VX   #This calculates the optimal variable input levels.
 ###############################################################################
 e<-dea(X,Y,RTS="vrs",ORIENTATION="out")#Run dea model using Benchmarking package to test
 bench<-round(e$objval,3)  
-################################################################################
+###############################################################################
 summary(status)    #See if everything Solved
 summary(res)       #results
 summary(bench)     #Results from Benchmark package
