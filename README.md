@@ -14,6 +14,8 @@ Output Oriented Models - Output Oriented Technical Efficiency
 
 Input Oriented Models -  Input Oriented Technical Efficiency
 
+bootstrap - Routines to Bootstrap both input and output oriented DEA models
+
 Documentation - Documentation
 
 
