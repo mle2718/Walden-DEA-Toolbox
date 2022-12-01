@@ -17,7 +17,11 @@ Output Oriented Technical Efficiency - Holds programs which solve the output ori
 
 Input Oriented Technical Efficiency - Holds programs which solve the input oriented technical efficiency problem.
 
-Directional Distance Function - DDF models written in R. 
+Directional Distance Function - DDF models written in R. These include models which expand outputs, or contract inputs and models which include undesirable outputs where good outputs are expanded and undesirable outputs contracted. These models initially were written to measure efficiency for polluting industries where TE depended both on the ability to expand desirable outputs and contract undesirable outputs.
+
+Bootstrap Models - The programs allow bootstrapping of DEA models using a subsample bootstrap procedure. The subsample size was based on algorithm 6.1 found in:
+
+Politis, Dimitris N, Joseph P Romano, and Michael Wolf. 2001. "On the asymptotic theory of subsampling." Statistica Sinica: 1105-1124.
 
 
 
