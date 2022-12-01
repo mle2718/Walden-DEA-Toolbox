@@ -61,7 +61,7 @@ status=0
 for(s in 1:(S-1)){
 
   A[1:M,S]=-A[1:M,s]         #replace last column in A for m outputs 
-                             #by negative s A column for output oriented model
+                             #by negative A column s for output oriented model
   
   rhs=c(rep(0,M),A[(M+1):(M+N),s],1) #rhs is zero for outputs
   
